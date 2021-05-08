@@ -21,7 +21,7 @@ namespace vFoodApi.Migrations
 
             modelBuilder.Entity("Models.Business", b =>
                 {
-                    b.Property<Guid>("BussinessId")
+                    b.Property<Guid>("BusinessId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -40,11 +40,31 @@ namespace vFoodApi.Migrations
                     b.Property<Guid>("MerchantId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("BussinessId");
+                    b.HasKey("BusinessId");
 
                     b.HasIndex("MerchantId");
 
                     b.ToTable("Businesses");
+                });
+
+            modelBuilder.Entity("Models.Category", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CategoryImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedAt")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Models.Customer", b =>
@@ -82,8 +102,11 @@ namespace vFoodApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -101,6 +124,10 @@ namespace vFoodApi.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("FoodItemId");
+
+                    b.HasIndex("BusinessId");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("FoodItems");
                 });
@@ -161,6 +188,9 @@ namespace vFoodApi.Migrations
                     b.Property<long>("OrderNumber")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("OrderStatus")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PMethod")
                         .HasColumnType("nvarchar(max)");
 
@@ -188,7 +218,7 @@ namespace vFoodApi.Migrations
                     b.Property<decimal>("FoodPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Qauntity")
@@ -208,10 +238,25 @@ namespace vFoodApi.Migrations
                     b.HasOne("Models.Merchant", "Merchant")
                         .WithMany()
                         .HasForeignKey("MerchantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Merchant");
+                });
+
+            modelBuilder.Entity("Models.FoodItem", b =>
+                {
+                    b.HasOne("Models.Business", null)
+                        .WithMany("FoodItems")
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Models.Category", null)
+                        .WithMany("FoodItemList")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Models.Order", b =>
@@ -219,13 +264,13 @@ namespace vFoodApi.Migrations
                     b.HasOne("Models.Business", "Business")
                         .WithMany()
                         .HasForeignKey("BusinessId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Business");
@@ -238,16 +283,25 @@ namespace vFoodApi.Migrations
                     b.HasOne("Models.FoodItem", "FoodItem")
                         .WithMany()
                         .HasForeignKey("FoodItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Models.Order", null)
                         .WithMany("OrderDetails")
                         .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("FoodItem");
+                });
+
+            modelBuilder.Entity("Models.Business", b =>
+                {
+                    b.Navigation("FoodItems");
+                });
+
+            modelBuilder.Entity("Models.Category", b =>
+                {
+                    b.Navigation("FoodItemList");
                 });
 
             modelBuilder.Entity("Models.Order", b =>

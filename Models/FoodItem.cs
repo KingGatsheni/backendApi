@@ -7,8 +7,9 @@ namespace Models
     {
         [Key]
         public Guid FoodItemId { get; set; }
+        public Guid BusinessId { get; set; }
+        public Guid CategoryId  { get; set; }
         public string FoodItemName { get; set; }
-        public string Category { get; set; }   
         public string FoodItemImage { get; set; }
         public string Description { get; set; }
         public bool FoodItemStatus { get; set; }

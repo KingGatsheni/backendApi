@@ -11,51 +11,49 @@ namespace vFoodApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BusinessesController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private readonly VarsityDbContext _context;
 
-        public BusinessesController(VarsityDbContext context)
+        public CategoriesController(VarsityDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Businesses
+        // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Business>>> GetBusinesses()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Businesses
-            .Include(x => x.Merchant)
-            .Include(x => x.FoodItems)
+            return await _context.Categories
+            .Include(x => x.FoodItemList)
             .ToListAsync();
         }
 
-        // GET: api/Businesses/5
+        // GET: api/Categories/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Business>> GetBusiness(Guid id)
+        public async Task<ActionResult<Category>> GetCategory(Guid id)
         {
-            var business = await _context.Businesses
-            .FindAsync(id);
+            var category = await _context.Categories.FindAsync(id);
 
-            if (business == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return business;
+            return category;
         }
 
-        // PUT: api/Businesses/5
+        // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBusiness(Guid id, Business business)
+        public async Task<IActionResult> PutCategory(Guid id, Category category)
         {
-            if (id != business.BusinessId)
+            if (id != category.CategoryId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(business).State = EntityState.Modified;
+            _context.Entry(category).State = EntityState.Modified;
 
             try
             {
@@ -63,7 +61,7 @@ namespace vFoodApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BusinessExists(id))
+                if (!CategoryExists(id))
                 {
                     return NotFound();
                 }
@@ -76,36 +74,36 @@ namespace vFoodApi.Controllers
             return NoContent();
         }
 
-        // POST: api/Businesses
+        // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Business>> PostBusiness(Business business)
+        public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-            _context.Businesses.Add(business);
+            _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBusiness", new { id = business.BusinessId }, business);
+            return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
         }
 
-        // DELETE: api/Businesses/5
+        // DELETE: api/Categories/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBusiness(Guid id)
+        public async Task<IActionResult> DeleteCategory(Guid id)
         {
-            var business = await _context.Businesses.FindAsync(id);
-            if (business == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
 
-            _context.Businesses.Remove(business);
+            _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool BusinessExists(Guid id)
+        private bool CategoryExists(Guid id)
         {
-            return _context.Businesses.Any(e => e.BusinessId == id);
+            return _context.Categories.Any(e => e.CategoryId == id);
         }
     }
 }

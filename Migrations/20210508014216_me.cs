@@ -3,10 +3,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace vFoodApi.Migrations
 {
-    public partial class vFoods : Migration
+    public partial class me : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
@@ -22,23 +36,6 @@ namespace vFoodApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.CustomerId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FoodItems",
-                columns: table => new
-                {
-                    FoodItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FoodItemName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FoodItemImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FoodItemStatus = table.Column<bool>(type: "bit", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FoodItems", x => x.FoodItemId);
                 });
 
             migrationBuilder.CreateTable(
@@ -66,7 +63,7 @@ namespace vFoodApi.Migrations
                 name: "Businesses",
                 columns: table => new
                 {
-                    BussinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MerchantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BTelephone = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -75,13 +72,40 @@ namespace vFoodApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Businesses", x => x.BussinessId);
+                    table.PrimaryKey("PK_Businesses", x => x.BusinessId);
                     table.ForeignKey(
                         name: "FK_Businesses_Merchants_MerchantId",
                         column: x => x.MerchantId,
                         principalTable: "Merchants",
-                        principalColumn: "MerchantId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "MerchantId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FoodItems",
+                columns: table => new
+                {
+                    FoodItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FoodItemName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FoodItemImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FoodItemStatus = table.Column<bool>(type: "bit", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodItems", x => x.FoodItemId);
+                    table.ForeignKey(
+                        name: "FK_FoodItems_Businesses_BusinessId",
+                        column: x => x.BusinessId,
+                        principalTable: "Businesses",
+                        principalColumn: "BusinessId");
+                    table.ForeignKey(
+                        name: "FK_FoodItems_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "CategoryId");
                 });
 
             migrationBuilder.CreateTable(
@@ -91,25 +115,24 @@ namespace vFoodApi.Migrations
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrderNumber = table.Column<long>(type: "bigint", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MerchantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderStatus = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.OrderId);
                     table.ForeignKey(
+                        name: "FK_Orders_Businesses_BusinessId",
+                        column: x => x.BusinessId,
+                        principalTable: "Businesses",
+                        principalColumn: "BusinessId");
+                    table.ForeignKey(
                         name: "FK_Orders_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
-                        principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_Merchants_MerchantId",
-                        column: x => x.MerchantId,
-                        principalTable: "Merchants",
-                        principalColumn: "MerchantId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CustomerId");
                 });
 
             migrationBuilder.CreateTable(
@@ -117,10 +140,10 @@ namespace vFoodApi.Migrations
                 columns: table => new
                 {
                     OrderDetailId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FoodItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FoodPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Qauntity = table.Column<int>(type: "int", nullable: false)
+                    Qauntity = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -129,20 +152,28 @@ namespace vFoodApi.Migrations
                         name: "FK_OrderDetails_FoodItems_FoodItemId",
                         column: x => x.FoodItemId,
                         principalTable: "FoodItems",
-                        principalColumn: "FoodItemId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "FoodItemId");
                     table.ForeignKey(
                         name: "FK_OrderDetails_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
-                        principalColumn: "OrderId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "OrderId");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Businesses_MerchantId",
                 table: "Businesses",
                 column: "MerchantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodItems_BusinessId",
+                table: "FoodItems",
+                column: "BusinessId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodItems_CategoryId",
+                table: "FoodItems",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_FoodItemId",
@@ -155,21 +186,18 @@ namespace vFoodApi.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_BusinessId",
+                table: "Orders",
+                column: "BusinessId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_MerchantId",
-                table: "Orders",
-                column: "MerchantId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Businesses");
-
             migrationBuilder.DropTable(
                 name: "OrderDetails");
 
@@ -178,6 +206,12 @@ namespace vFoodApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Businesses");
 
             migrationBuilder.DropTable(
                 name: "Customers");

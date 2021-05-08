@@ -15,6 +15,7 @@ namespace Models
         public Business Business { get; set; }
         public String PMethod { get; set; }
         public decimal TotalPrice { get; set; }
+        public bool OrderStatus { get; set; }
         public List<OrderDetail> OrderDetails { get; set; }
 
     }
